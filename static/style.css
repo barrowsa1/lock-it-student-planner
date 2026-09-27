@@ -1,0 +1,257 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    padding: 3rem 0;
+    background: #f4f7f2;
+    color: #20312a;
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+.welcome {
+    width: min(90%, 720px);
+    padding: 1rem 2rem 2rem;
+    border-top: 4px solid #52745f;
+}
+
+.intro {
+    text-align: center;
+}
+
+h1 {
+    margin: 0 0 0.5rem;
+    font-size: 3rem;
+}
+
+h2 {
+    margin: 0 0 1.25rem;
+    font-size: 1.5rem;
+}
+
+p {
+    margin: 0.75rem 0;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+.message {
+    color: #52645a;
+}
+
+.planner,
+.assignments {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #cbd6cc;
+}
+
+.assignment-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.assignment-form label {
+    display: grid;
+    gap: 0.4rem;
+    font-family: Arial, sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.assignment-form input,
+.assignment-form select {
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0.6rem 0.7rem;
+    border: 1px solid #aebdaf;
+    border-radius: 4px;
+    background: #fff;
+    color: #20312a;
+    font: inherit;
+}
+
+.assignment-form input:focus,
+.assignment-form select:focus {
+    outline: 2px solid #52745f;
+    outline-offset: 1px;
+}
+
+.assignment-form button {
+    min-height: 2.75rem;
+    padding: 0.6rem 1rem;
+    border: 0;
+    border-radius: 4px;
+    background: #365c45;
+    color: #fff;
+    cursor: pointer;
+    font: 600 0.95rem Arial, sans-serif;
+}
+
+.assignment-form button:hover {
+    background: #294a36;
+}
+
+.error {
+    color: #a12d25;
+}
+
+.assignments ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.assignment-filters {
+    display: inline-flex;
+    gap: 0.2rem;
+    margin-bottom: 0.5rem;
+    padding: 0.25rem;
+    border-radius: 4px;
+    background: #e7eee8;
+}
+
+.assignment-filters a {
+    padding: 0.45rem 0.75rem;
+    border-radius: 3px;
+    color: #365c45;
+    font: 600 0.9rem Arial, sans-serif;
+    text-decoration: none;
+}
+
+.assignment-filters a:hover {
+    background: #f4f7f2;
+}
+
+.assignment-filters a.filter-selected {
+    background: #fff;
+    color: #20312a;
+    box-shadow: 0 1px 2px #20312a24;
+}
+
+.assignment-filters a:focus-visible {
+    outline: 2px solid #52745f;
+    outline-offset: 2px;
+}
+
+.assignments li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #d8e0d9;
+}
+
+.assignment-completed {
+    background: #edf3ed;
+}
+
+.assignments h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.assignment-completed h3 {
+    color: #52645a;
+    text-decoration: line-through;
+}
+
+.assignment-details {
+    min-width: 0;
+}
+
+.assignments li p,
+.empty-state {
+    margin-bottom: 0;
+    color: #52645a;
+}
+
+.priority {
+    flex: 0 0 auto;
+    font: 600 0.85rem Arial, sans-serif;
+}
+
+.priority-high {
+    color: #a12d25;
+}
+
+.priority-medium {
+    color: #8a6415;
+}
+
+.priority-low {
+    color: #365c45;
+}
+
+.assignment-tools {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+}
+
+.assignment-tools form {
+    margin: 0;
+}
+
+.assignment-button {
+    padding: 0.35rem 0.5rem;
+    border: 1px solid #aebdaf;
+    border-radius: 4px;
+    background: #fff;
+    color: #294a36;
+    cursor: pointer;
+    font: 0.85rem Arial, sans-serif;
+}
+
+.assignment-button:hover {
+    background: #e4ece5;
+}
+
+.delete-button {
+    border-color: #d9b4b0;
+    color: #a12d25;
+}
+
+.delete-button:hover {
+    background: #f8e9e7;
+}
+
+.completion-label {
+    display: inline-block;
+    margin-top: 0.4rem;
+    color: #365c45;
+    font: 600 0.8rem Arial, sans-serif;
+}
+
+@media (max-width: 560px) {
+    body {
+        padding: 2rem 0;
+    }
+
+    .welcome {
+        padding-right: 1.25rem;
+        padding-left: 1.25rem;
+    }
+
+    .assignment-form {
+        grid-template-columns: 1fr;
+    }
+
+    .assignments li {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .assignment-tools {
+        justify-content: flex-start;
+    }
+}

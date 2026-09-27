@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lock-It | Student Planner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="welcome">
+        <header class="intro">
+            <h1>Lock-It</h1>
+            <p>Your student productivity planner.</p>
+            <p class="message">Welcome! A little organization goes a long way.</p>
+        </header>
+
+        <section class="planner" aria-labelledby="assignment-heading">
+            <h2 id="assignment-heading">Add an assignment</h2>
+            <form method="post" action="{{ url_for('home', filter=selected_filter) }}" class="assignment-form">
+                <label>
+                    Assignment title
+                    <input type="text" name="title" required>
+                </label>
+                <label>
+                    Course name
+                    <input type="text" name="course" required>
+                </label>
+                <label>
+                    Due date
+                    <input type="date" name="due_date" required>
+                </label>
+                <label>
+                    Priority
+                    <select name="priority" required>
+                        <option value="" disabled selected>Choose priority</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </label>
+                <button type="submit">Add assignment</button>
+            </form>
+            {% if error %}
+                <p class="error" role="alert">{{ error }}</p>
+            {% endif %}
+        </section>
+
+        <section class="assignments" aria-labelledby="list-heading" aria-live="polite">
+            <h2 id="list-heading">Assignments</h2>
+            <nav class="assignment-filters" aria-label="Filter assignments">
+                {% for filter_value, filter_label in [('all', 'All'), ('active', 'Active'), ('completed', 'Completed')] %}
+                    <a href="{{ url_for('home', filter=filter_value) }}" class="{% if selected_filter == filter_value %}filter-selected{% endif %}" {% if selected_filter == filter_value %}aria-current="page"{% endif %}>{{ filter_label }}</a>
+                {% endfor %}
+            </nav>
+            {% if filtered_assignments %}
+                <ul>
+                    {% for assignment_index, assignment in filtered_assignments %}
+                        <li class="{% if assignment.completed %}assignment-completed{% endif %}">
+                            <div class="assignment-details">
+                                <h3>{{ assignment.title }}</h3>
+                                <p>{{ assignment.course }} - Due {{ assignment.due_date }}</p>
+                                {% if assignment.completed %}<span class="completion-label">Completed</span>{% endif %}
+                            </div>
+                            <div class="assignment-tools">
+                                <span class="priority priority-{{ assignment.priority }}">{{ assignment.priority|title }}</span>
+                                <form method="post" action="{{ url_for('toggle_completion', assignment_index=assignment_index, filter=selected_filter) }}">
+                                    <button type="submit" class="assignment-button">
+                                        {% if assignment.completed %}Mark incomplete{% else %}Mark complete{% endif %}
+                                    </button>
+                                </form>
+                                <form method="post" action="{{ url_for('delete_assignment', assignment_index=assignment_index, filter=selected_filter) }}">
+                                    <button type="submit" class="assignment-button delete-button">Delete</button>
+                                </form>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="empty-state">
+                    {% if selected_filter == 'active' %}
+                        No active assignments.
+                    {% elif selected_filter == 'completed' %}
+                        No completed assignments.
+                    {% else %}
+                        No assignments yet.
+                    {% endif %}
+                </p>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>
