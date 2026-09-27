@@ -9,14 +9,43 @@
 <body>
     <main class="welcome">
         <header class="intro">
+            <span class="brand-mark" role="img" aria-label="Lock-It notepad and pen logo">
+                <svg viewBox="0 0 76 76" aria-hidden="true">
+                    <rect x="8" y="8" width="48" height="60" rx="7" fill="#526bd5" />
+                    <path d="M8 15a7 7 0 0 1 7-7h34a7 7 0 0 1 7 7v11H8z" fill="#f3cf59" />
+                    <path d="M15 8v6m10-6v6m10-6v6m10-6v6" stroke="#fff7d6" stroke-width="2.5" stroke-linecap="round" />
+                    <path d="M16 35h31M16 51h31M16 58h22" stroke="#aebcf7" stroke-width="2" stroke-linecap="round" />
+                    <text x="32" y="46" fill="#fff" font-family="Arial, sans-serif" font-size="7" font-weight="700" text-anchor="middle">Lock-It</text>
+                    <g transform="rotate(17 63 43)">
+                        <rect x="59" y="21" width="8" height="39" rx="4" fill="#d9689b" />
+                        <rect x="59" y="21" width="8" height="10" rx="4" fill="#7459c7" />
+                        <path d="M59 56h8l-4 9z" fill="#f3cf59" />
+                    </g>
+                </svg>
+            </span>
             <h1>Lock-It</h1>
-            <p>Your student productivity planner.</p>
-            <p class="message">Welcome! A little organization goes a long way.</p>
+            <p class="message">Lock in your goals. Stay on track.</p>
         </header>
+
+        <div class="dashboard-layout">
+            <div class="planner-column">
+                <form method="get" action="{{ url_for('home') }}" class="assignment-search">
+                    <input type="hidden" name="filter" value="{{ selected_filter }}">
+                    <input type="hidden" name="year" value="{{ calendar_year }}">
+                    <input type="hidden" name="month" value="{{ calendar_month }}">
+                    <label class="visually-hidden" for="assignment-search-input">Search assignments by title or course</label>
+                    <div class="search-controls">
+                        <input id="assignment-search-input" type="search" name="q" value="{{ search_query }}" placeholder="Search by assignment or course">
+                        <button type="submit">Search</button>
+                        {% if search_query %}
+                            <a href="{{ url_for('home', filter=selected_filter, year=calendar_year, month=calendar_month) }}">Clear</a>
+                        {% endif %}
+                    </div>
+                </form>
 
         <section class="planner" aria-labelledby="assignment-heading">
             <h2 id="assignment-heading">Add an assignment</h2>
-            <form method="post" action="{{ url_for('home', filter=selected_filter) }}" class="assignment-form">
+            <form method="post" action="{{ url_for('home', filter=selected_filter, q=search_query or None, year=calendar_year, month=calendar_month) }}" class="assignment-form">
                 <label>
                     Assignment title
                     <input type="text" name="title" required>
@@ -49,7 +78,7 @@
             <h2 id="list-heading">Assignments</h2>
             <nav class="assignment-filters" aria-label="Filter assignments">
                 {% for filter_value, filter_label in [('all', 'All'), ('active', 'Active'), ('completed', 'Completed')] %}
-                    <a href="{{ url_for('home', filter=filter_value) }}" class="{% if selected_filter == filter_value %}filter-selected{% endif %}" {% if selected_filter == filter_value %}aria-current="page"{% endif %}>{{ filter_label }}</a>
+                    <a href="{{ url_for('home', filter=filter_value, q=search_query or None, year=calendar_year, month=calendar_month) }}" class="{% if selected_filter == filter_value %}filter-selected{% endif %}" {% if selected_filter == filter_value %}aria-current="page"{% endif %}>{{ filter_label }}</a>
                 {% endfor %}
             </nav>
             {% if filtered_assignments %}
@@ -63,12 +92,12 @@
                             </div>
                             <div class="assignment-tools">
                                 <span class="priority priority-{{ assignment.priority }}">{{ assignment.priority|title }}</span>
-                                <form method="post" action="{{ url_for('toggle_completion', assignment_index=assignment_index, filter=selected_filter) }}">
+                                <form method="post" action="{{ url_for('toggle_completion', assignment_index=assignment_index, filter=selected_filter, q=search_query or None, year=calendar_year, month=calendar_month, day=selected_day.isoformat() if selected_day else None) }}">
                                     <button type="submit" class="assignment-button">
                                         {% if assignment.completed %}Mark incomplete{% else %}Mark complete{% endif %}
                                     </button>
                                 </form>
-                                <form method="post" action="{{ url_for('delete_assignment', assignment_index=assignment_index, filter=selected_filter) }}">
+                                <form method="post" action="{{ url_for('delete_assignment', assignment_index=assignment_index, filter=selected_filter, q=search_query or None, year=calendar_year, month=calendar_month, day=selected_day.isoformat() if selected_day else None) }}">
                                     <button type="submit" class="assignment-button delete-button">Delete</button>
                                 </form>
                             </div>
@@ -77,7 +106,9 @@
                 </ul>
             {% else %}
                 <p class="empty-state">
-                    {% if selected_filter == 'active' %}
+                    {% if search_query %}
+                        No assignments match that search.
+                    {% elif selected_filter == 'active' %}
                         No active assignments.
                     {% elif selected_filter == 'completed' %}
                         No completed assignments.
@@ -87,6 +118,86 @@
                 </p>
             {% endif %}
         </section>
+            </div>
+
+            <aside class="calendar-sidebar" aria-labelledby="calendar-heading">
+                <section class="calendar-panel">
+                    <header class="calendar-header">
+                        <div>
+                            <p class="calendar-eyebrow">Due dates</p>
+                            <h2 id="calendar-heading">{{ calendar_month_label }}</h2>
+                        </div>
+                        <nav class="calendar-navigation" aria-label="Calendar month navigation">
+                            {% if previous_month %}
+                                <a href="{{ url_for('home', year=previous_month.year, month=previous_month.month, filter=selected_filter, q=search_query or None) }}" aria-label="Previous month" title="Previous month">&lsaquo;</a>
+                            {% else %}
+                                <span aria-hidden="true">&lsaquo;</span>
+                            {% endif %}
+                            {% if next_month %}
+                                <a href="{{ url_for('home', year=next_month.year, month=next_month.month, filter=selected_filter, q=search_query or None) }}" aria-label="Next month" title="Next month">&rsaquo;</a>
+                            {% else %}
+                                <span aria-hidden="true">&rsaquo;</span>
+                            {% endif %}
+                        </nav>
+                    </header>
+
+                    <div class="calendar-grid" role="grid" aria-label="{{ calendar_month_label }} calendar">
+                        {% for weekday in weekday_names %}
+                            <span class="calendar-weekday" role="columnheader">{{ weekday }}</span>
+                        {% endfor %}
+                        {% for week in calendar_weeks %}
+                            {% for cell in week %}
+                                {% if cell.day %}
+                                    <div class="calendar-day{% if cell.assignments %} day-has-assignments{% endif %}{% if cell.iso_date == today.isoformat() %} day-today{% endif %}{% if selected_day and cell.iso_date == selected_day.isoformat() %} day-selected{% endif %}" role="gridcell">
+                                        {% if cell.assignments %}
+                                            <a class="calendar-date" href="{{ url_for('home', year=calendar_year, month=calendar_month, day=cell.iso_date, filter=selected_filter, q=search_query or None) }}#calendar-due-list" aria-label="{{ cell.iso_date }}: {{ cell.assignments|length }} assignments due" {% if selected_day and cell.iso_date == selected_day.isoformat() %}aria-current="date"{% endif %}>
+                                                <span>{{ cell.day }}</span>
+                                                {% if cell.assignments|length > 1 %}<span class="calendar-count">{{ cell.assignments|length }}</span>{% endif %}
+                                            </a>
+                                            <div class="calendar-markers" aria-hidden="true">
+                                                {% for assignment in cell.assignments[:3] %}
+                                                    <span class="calendar-marker{% if assignment.completed %} marker-completed{% endif %}"></span>
+                                                {% endfor %}
+                                                {% if cell.assignments|length > 3 %}<span class="calendar-more">+{{ cell.assignments|length - 3 }}</span>{% endif %}
+                                            </div>
+                                        {% else %}
+                                            <span class="calendar-day-number">{{ cell.day }}</span>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <span class="calendar-day calendar-empty" aria-hidden="true"></span>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="calendar-legend" aria-label="Calendar assignment key">
+                        <span><i class="legend-dot"></i> Active</span>
+                        <span><i class="legend-dot legend-completed"></i> Completed</span>
+                    </div>
+
+                    <section class="calendar-due-list" id="calendar-due-list" aria-live="polite">
+                        {% if selected_day %}
+                            <h3>Due {{ selected_day_label }}</h3>
+                            <ul>
+                                {% for assignment in selected_day_assignments %}
+                                    <li class="{% if assignment.completed %}due-completed{% endif %}">
+                                        <span class="due-status" aria-hidden="true"></span>
+                                        <div>
+                                            <strong>{{ assignment.title }}</strong>
+                                            <span>{{ assignment.course }} &middot; {{ assignment.priority|title }}</span>
+                                        </div>
+                                        {% if assignment.completed %}<small>Done</small>{% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>Select a marked date to see what's due.</p>
+                        {% endif %}
+                    </section>
+                </section>
+            </aside>
+        </div>
     </main>
 </body>
 </html>
