@@ -2,6 +2,8 @@
 
 Lock-It is a simple student planner for organizing assignments, tracking due dates, and keeping coursework on schedule.
 
+![Lock-It student planner interface](screenshots/11-program-layout.png)
+
 ## Features
 
 - Add assignments with a title, course name, due date, and priority.

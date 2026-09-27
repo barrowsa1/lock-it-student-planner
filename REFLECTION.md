@@ -32,7 +32,7 @@ Once I was ready to build, I broke the work into smaller steps. I started with a
 
 *The assignment form added after the basic homepage was working.*
 
-![Assignment completion and delete controls](screenshots/05-Complete-delete-feature.png)
+![Assignment completion and delete controls](screenshots/05-complete-delete-feature.png)
 
 *Assignment completion and deletion controls in Lock-It.*
 
